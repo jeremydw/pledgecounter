@@ -1,0 +1,76 @@
+<!doctype html>
+<meta charset="utf-8">
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  .main {
+    background: #000;
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    color: #fff;
+    margin: 20px auto;
+    padding: 20px;
+    width: 640px;
+  }
+  .results .number {
+    font-size: 40px;
+    font-weight: bold;
+  }
+  .results {
+    color: #C4FF1D;
+    text-align: center;
+  }
+</style>
+<body>
+  <div class="main">
+
+    <div ng-controller="PledgeController">
+
+      <div class="row">
+        <div class="col-md-9">
+
+          <form class="form-inline" role="form">
+            <div class="intro">
+              <p>Take the pledge to <em>pay attention</em> to our own actions and find ways to intervene when we witness examples of harassment or bullying.
+              <div class="input-group">
+                <input type="text" ng-model="pledge.email" placeholder="Enter your email" class="form-control">
+                <div class="input-group-btn btn-group">
+                  <button class="btn btn-primary" ng-click="go()">Sign the pledge</button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+        </div>
+        <div class="col-md-3" ng-cloak>
+
+        <div class="results">
+          <div class="number">{{pledgeCount}}</div>
+          <div class="meta">have pledged</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var init = function() {
+    gapi.client.load('pledgecounter', 'v0.1', function() {
+      rpc = gapi.client.pledgecounter;
+      angular.bootstrap(document);
+    }, '/_ah/api');
+  };
+
+  var PledgeController = function($scope) {
+    rpc.pledges.count().execute(function(resp) {
+      $scope.pledgeCount = resp['pledge_count'];
+      $scope.$apply();
+    });
+
+    $scope.go = function() {
+      window.location = 'form.html?email=' + encodeURIComponent($scope.pledge.email);
+    };
+  };
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="https://apis.google.com/js/client.js?onload=init"></script>

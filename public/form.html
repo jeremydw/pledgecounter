@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+<meta charset="utf-8">
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+<link href="social-buttons.css" rel="stylesheet">
+<style>
+  body {
+    max-width: 800px;
+    margin: 20px auto;
+  }
+  h2 {
+    font-size: 1.2em;
+  }
+  p {
+    font-size: 12px;
+  }
+  .group {
+    margin-bottom: 15px;
+  }
+  form {
+    margin-bottom: 20px;
+  }
+  .results {
+    background: #efefef;
+    border-radius: 3px;
+    margin-bottom: 15px;
+  }
+  .results .number {
+    font-size: 40px;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  .results {
+    text-align: center;
+  }
+  .results * {
+    vertical-align: middle;
+  }
+  .btn i {
+    display: inline-block;
+    font-size: 1.3em;
+    width: 15px;
+  }
+</style>
+<body>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>It’s time for us to PAY ATTENTION to our own actions and find ways to intervene when we witness examples of harassment or bullying.  By taking the pledge, I commit to:
+
+      <h2>Speak up for others</h2>
+      <p>I will not be a bystander while another person is harassed or bullied in my presence.  I will not be confrontational or use violence when I witness such behavior.  Rather, I will help the person to exit the situation and provide appropriate support when necessary.
+
+      <h2>Choose my words wisely</h2>
+      <p>I will not knowingly use words that indicate disrespect or lack of concern for a fellow human being.
+
+      <h2>Track my online behavior</h2> 
+      <p>I will be mindful of what I post on my social media accounts, including what I share on the pages and walls of others.  I recognize that even when I’m joking with my friends, others could misinterpret or be offended by what I’ve shared.
+
+      <h2>Inquire</h2>
+      <p>When I notice someone using questionable language to describe a person, object, or situation, I will ask this person why they are using that particular language and engage in a conversation to help them understand the impact of their words.
+
+      <h2>Challenge myself</h2>
+      <p>I will seek new knowledge about racism, classism, ageism, ableism, sexism, heterosexism, genderism, religious bigotry, xenophobia and other forms of oppression and privilege. 
+
+      <h2>Spread the word</h2>
+      <p>I will tell my friends about the pledge and post the digital logo on my social media pages so that others will know that I PAY ATTENTION.
+
+      <p>VIEW THE VIDEO HERE: <a href="http://youtu.be/rpDKriGfrrc">http://youtu.be/rpDKriGfrrc</a>
+    </div>
+  <div class="col-md-4">
+
+    <div ng-controller="FormController" ng-cloak>
+      <form class="form" ng-hide="submitted">
+        <div class="intro">
+          <div class="group">
+            <label>First name (given name)</label>
+            <input autofocus type="text" ng-model="pledge.first_name" class="form-control" required>
+          </div>
+          <div class="group">
+            <label>Last name (family name)</label>
+            <input type="text" ng-model="pledge.last_name" class="form-control" required>
+          </div>
+          <div class="group">
+            <label>Email address</label>
+            <input type="text" ng-model="pledge.email" class="form-control" required>
+          </div>
+          <div class="group">
+            <button class="btn btn-primary" ng-click="create(pledge)">Sign the pledge to Pay Attention</button>
+          </div>
+        </div>
+      </form>
+      <div class="results" ng-cloak>
+        <span class="number">{{pledgeCount}}</span>
+        <span class="meta">have pledged</span>
+      </div>
+
+      <div ng-show="submitted" ng-cloak>
+        <form class="form">
+          <p>Thank you for signing the pledge. Now share your testimonial about how you Pay Attention below!
+          <div class="group">
+            <textarea class="form-control" rows="6" autofocus id="textarea">#ProjectPayAttn</textarea>
+          </div>
+            <button ng-click="twitter()" class="btn btn-twitter btn-large"><i class="icon-twitter"></i></button>
+            <button ng-click="facebook()" class="btn btn-facebook btn-large"><i class="icon-facebook"></i></button>
+            <button ng-click="google()" class="btn btn-google-plus btn-large"><i class="icon-google-plus"></i></button>
+            <button ng-click="email()" class="btn btn-github btn-large"><i class="icon-envelope"></i></button>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var init = function() {
+    gapi.client.load('pledgecounter', 'v0.1', function() {
+      rpc = gapi.client.pledgecounter;
+      angular.bootstrap(document);
+    }, '/_ah/api');
+  };
+
+  var FormController = function($scope, $location) { 
+
+    rpc.pledges.count().execute(function(resp) {
+      $scope.pledgeCount = resp['pledge_count'];
+      var email = getParam('email');
+      if (email) {
+        $scope.pledge = {};
+        $scope.pledge.email = email;
+      }
+      $scope.$apply();
+    });
+
+    $scope.create = function(pledge) {
+      rpc.pledges.create({'pledge': pledge}).execute(function(resp) {
+        if (resp['error']) {
+          alert(resp['error']['message']);
+          return;
+        }
+        $scope.submitted = true;
+        $scope.pledgeCount = resp['pledge_count'];
+        $scope.$apply();
+      });
+    };
+
+    $scope.facebook = function() {
+      window.open(
+        'https://www.facebook.com/sharer/sharer.php?u='
+        + encodeURIComponent('http://projectpayattn.com/') + '&subject='
+        + encodeURIComponent('Project Pay Attention'), 
+        'facebook-share-dialog', 
+        'width=626,height=436'); 
+    };
+
+    $scope.google = function() {
+      window.open(
+        'https://plus.google.com/share?url='
+        + encodeURIComponent('http://projectpayattn.com/'),
+        null,
+        'width=626,height=436'); 
+    };
+
+    $scope.twitter = function() {
+      var content = document.getElementById('textarea').value;
+      window.open(
+        'http://twitter.com/?status=' + encodeURIComponent(content),
+        null, 'width=626,height=436');
+    };
+
+    $scope.email = function() {
+      var content = document.getElementById('textarea').value;
+      window.location = 'mailto:?body=' + encodeURIComponent(content)
+      + '&subject=Project Pay Attention';
+    };
+
+    var getParam = function(name) {
+      name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+          results = regex.exec(location.search);
+      return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+  };
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="https://apis.google.com/js/client.js?onload=init"></script>

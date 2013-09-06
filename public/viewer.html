@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pledge Viewer</title>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+<body style="padding: 20px;">
+
+<form>
+  <p><a href="/public/csv" class="btn btn-primary">Download CSV</a>
+</form>
+
+<div ng-controller="PledgeController" ng-cloak>
+  <legend>{{pledgeCount}} have joined</legend>
+  <table class="table table-condensed">
+    <tr ng-repeat="pledge in pledges">
+      <td>{{pledge.first_name}}
+      <td>{{pledge.last_name}}
+      <td>{{pledge.email}}
+  </table>
+</div>
+
+<script>
+  var init = function() {
+    gapi.client.load('pledgecounter', 'v0.1', function() {
+      rpc = gapi.client.pledgecounter;
+      angular.bootstrap(document);
+    }, '/_ah/api');
+  };
+
+  var PledgeController = function($scope) {
+    rpc.pledges.list().execute(function(resp) {
+      $scope.pledges = resp['pledges'];
+      $scope.pledgeCount = resp['pledge_count'];
+      $scope.$apply();
+    });
+  };
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="https://apis.google.com/js/client.js?onload=init"></script>

@@ -1,0 +1,74 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pledge Counter</title>
+
+<style>
+  label {
+    display: block;
+  }
+</style>
+
+<p>
+  <em id="numPledges">--</em> have joined the movement.
+
+<form id="form" method="post">
+  <label>Email</label>
+  <input type="text" name="email">
+  <label>First name</label>
+  <input type="text" name="first_name">
+  <label>Last name</label>
+  <input type="text" name="last_name">
+  <label><input type="submit" value="I'm in"></label>
+  <div id="message"></div>
+</form>
+
+<div id="result" style="display: none;">
+  <h1>Thank You</h1>
+  <p>Lorem ipsum dolor sit amit.
+  <p><textarea cols="50" rows="6">#projectpayattn</textarea>
+  <p>{Twitter} {Facebook} {G+} {Email}
+</div>
+
+<script>
+  var rpc;
+
+  var init = function() {
+    window.console.log('Loading Pledge API...');
+    gapi.client.load('pledgecounter', 'v0.1', function() {
+      rpc = gapi.client.pledgecounter;
+      loadNumPledges();
+    }, '/_ah/api');
+  };
+
+  var onSubmit = function(e) {
+    e.preventDefault();
+
+    var email = document.forms['form']['email'].value;
+    var firstName = document.forms['form']['first_name'].value;
+    var lastName = document.forms['form']['last_name'].value;
+    rpc.pledges.create({'pledge': {
+      'email': email,
+      'first_name': firstName,
+      'last_name': lastName}
+    }).execute(function(resp) {
+      console.log(resp)
+      if (resp['error']) {
+        document.getElementById('message').textContent = resp['message'];
+        return;
+      }
+      document.getElementById('result').style.display = '';
+      document.getElementById('form').style.display = 'none';
+      loadNumPledges();
+    });
+  };
+  document.getElementById('form').onsubmit = onSubmit;
+
+  var loadNumPledges = function() {
+    var numPledges = document.getElementById('numPledges');
+    rpc.pledges.count().execute(function(resp) {
+      numPledges.textContent = resp['pledge_count'];
+    });
+  };
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="https://apis.google.com/js/client.js?onload=init"></script>
